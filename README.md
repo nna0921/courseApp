@@ -82,4 +82,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgements
 
 - Thanks to all contributors and testers who helped make this project possible.
-- Special thanks to our instructors and mentors for their guidance. 
+- Special thanks to our instructors and mentors for their guidance.
+
+  Published By: Anna Zubair (nna0921)
+  
