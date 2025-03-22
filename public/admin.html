@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="navbar.css">
+  
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5; /* Light grey background */
+            padding-top: 70px; /* Add padding for navbar */
+            color: #455a64; /* Dark teal-grey for text */
+        }
+        .container {
+            width: 100%;
+            padding: 20px;
+            min-height: calc(100vh - 90px);
+            margin-top: 0; /* Override Bootstrap's default margin */
+        }
+        /* Fix navbar overlapping content */
+        .navbar + .container {
+            padding-top: 20px; 
+        }
+        .course-management {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .course-list {
+            margin-top: 20px;
+            max-height: calc(100vh - 400px);
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+        .course-item {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0; /* Light grey */
+        }
+        .course-item:last-child {
+            border-bottom: none;
+        }
+        .course-card {
+            height: auto;
+            min-height: 200px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #e0f2f1; /* Very light teal */
+            color: #00695c; /* Darker teal */
+            border-bottom: 1px solid #b2dfdb;
+        }
+        .card-body {
+            background-color: #ffffff;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #f44336; /* Red */
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        .delete-btn:hover {
+            background-color: #f44336;
+            color: white;
+        }
+        .edit-btn {
+            position: absolute;
+            top: 10px;
+            right: 40px;
+            background: none;
+            border: none;
+            color: #00897b; /* Teal */
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        .edit-btn:hover {
+            background-color: #00897b;
+            color: white;
+        }
+        .course-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .course-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .course-list::-webkit-scrollbar-thumb {
+            background: #b2dfdb; /* Light teal */
+            border-radius: 4px;
+        }
+        .course-list::-webkit-scrollbar-thumb:hover {
+            background: #80cbc4; /* Medium teal */
+        }
+        .required-field::after {
+            content: " *";
+            color: #f44336; /* Red */
+        }
+        .form-label {
+            font-weight: 500;
+            color: #00695c; /* Darker teal */
+        }
+        .btn-primary {
+            border-bottom: 2px;
+            background-color: #00897b !important; /* Teal */
+            border-color: #00897b !important;
+        }
+        .btn-primary:hover {
+            background-color: #00695c !important; /* Darker teal */
+            border-color: #00695c !important;
+        }
+        .btn-danger {
+            background-color: #f44336 !important; /* Red */
+            border-color: #f44336 !important;
+        }
+        .btn-danger:hover {
+            background-color: #d32f2f !important; /* Darker red */
+            border-color: #d32f2f !important;
+        }
+        .prerequisites-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0; /* Light grey */
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .prerequisites-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .prerequisites-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        .prerequisites-list::-webkit-scrollbar-thumb {
+            background: #b2dfdb; /* Light teal */
+            border-radius: 3px;
+        }
+        .prerequisites-list::-webkit-scrollbar-thumb:hover {
+            background: #80cbc4; /* Medium teal */
+        }
+        .form-container {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+        .form-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .form-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .form-container::-webkit-scrollbar-thumb {
+            background: #b2dfdb; /* Light teal */
+            border-radius: 4px;
+        }
+        .form-container::-webkit-scrollbar-thumb:hover {
+            background: #80cbc4; /* Medium teal */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img src="images/course-map-logo.svg" alt="Course Map Logo">
+            <h1>CourseBot</h1>
+        </div>
+        <ul class="navbar-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/admin" class="active">Admin Dashboard</a></li>
+            <li><a href="/admin/students">Students</a></li>
+            <li><a href="/admin/courses">Courses</a></li>
+            <li><a href="#" onclick="logout(); return false;">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Admin Dashboard</h2>
+            <div>
+                <button class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#reportsModal">
+                    <i class="fas fa-chart-bar"></i> Generate Reports
+                </button>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentManagementModal">
+                    <i class="fas fa-users"></i> View Students
+                </button>
+            </div>
+        </div>
+        
+        <!-- Add Course Form -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Add New Course</h5>
+                <form id="addCourseForm">
+                    <div class="mb-3">
+                        <label for="courseName" class="form-label required-field">Course Name</label>
+                        <input type="text" class="form-control" id="courseName" required placeholder="Enter course name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="courseCode" class="form-label required-field">Course Code</label>
+                        <input type="text" class="form-control" id="courseCode" required placeholder="Enter unique course code">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="3" placeholder="Enter course description"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="scheduleDays" class="form-label required-field">Schedule Days</label>
+                        <select class="form-select" id="scheduleDays" multiple required>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+            </select>
+                        <small class="text-muted">Hold Ctrl/Cmd to select multiple days</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="scheduleTime" class="form-label required-field">Schedule Time</label>
+                        <input type="text" class="form-control" id="scheduleTime" required placeholder="e.g., 10:00-12:00">
+                        <small class="text-muted">Format: HH:MM-HH:MM (24-hour format)</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="maxSeats" class="form-label required-field">Maximum Seats</label>
+                        <input type="number" class="form-control" id="maxSeats" min="1" value="30" required>
+                        <small class="text-muted">Maximum number of students who can register for this course</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="prerequisites" class="form-label">Prerequisites</label>
+                        <div class="prerequisites-list">
+                            <div class="prerequisite-item">
+                                <input type="checkbox" id="prereq1" value="MATH101">
+                                <label for="prereq1">MATH101 - Basic Mathematics</label>
+                            </div>
+                            <div class="prerequisite-item">
+                                <input type="checkbox" id="prereq2" value="CS101">
+                                <label for="prereq2">CS101 - Introduction to Programming</label>
+                            </div>
+                            <div class="prerequisite-item">
+                                <input type="checkbox" id="prereq3" value="PHY101">
+                                <label for="prereq3">PHY101 - Basic Physics</label>
+                            </div>
+                            <div class="prerequisite-item">
+                                <input type="checkbox" id="prereq4" value="ENG101">
+                                <label for="prereq4">ENG101 - English Composition</label>
+                            </div>
+                            <div class="prerequisite-item">
+                                <input type="checkbox" id="prereq5" value="CHEM101">
+                                <label for="prereq5">CHEM101 - Basic Chemistry</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Course</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Course List -->
+        <div class="course-list">
+            <h3>Course List</h3>
+            <div id="courseList" class="row">
+                <!-- Course cards will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Course Modal -->
+    <div class="modal fade" id="editCourseModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Course</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCourseForm">
+                        <input type="hidden" id="editCourseId">
+                        <div class="mb-3">
+                            <label for="editCourseName" class="form-label required-field">Course Name</label>
+                            <input type="text" class="form-control" id="editCourseName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCourseCode" class="form-label required-field">Course Code</label>
+                            <input type="text" class="form-control" id="editCourseCode" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="editDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editScheduleDays" class="form-label required-field">Schedule Days</label>
+                            <select class="form-select" id="editScheduleDays" multiple required>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                            </select>
+                            <small class="text-muted">Hold Ctrl/Cmd to select multiple days</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editScheduleTime" class="form-label required-field">Schedule Time</label>
+                            <input type="text" class="form-control" id="editScheduleTime" required>
+                            <small class="text-muted">Format: HH:MM-HH:MM (24-hour format)</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMaxSeats" class="form-label required-field">Maximum Seats</label>
+                            <input type="number" class="form-control" id="editMaxSeats" min="1" required>
+                            <small class="text-muted">Maximum number of students who can register for this course</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPrerequisites" class="form-label">Prerequisites</label>
+                            <div class="prerequisites-list">
+                                <div class="prerequisite-item">
+                                    <input type="checkbox" id="editPrereq1" value="MATH101">
+                                    <label for="editPrereq1">MATH101 - Basic Mathematics</label>
+                                </div>
+                                <div class="prerequisite-item">
+                                    <input type="checkbox" id="editPrereq2" value="CS101">
+                                    <label for="editPrereq2">CS101 - Introduction to Programming</label>
+                                </div>
+                                <div class="prerequisite-item">
+                                    <input type="checkbox" id="editPrereq3" value="PHY101">
+                                    <label for="editPrereq3">PHY101 - Basic Physics</label>
+                                </div>
+                                <div class="prerequisite-item">
+                                    <input type="checkbox" id="editPrereq4" value="ENG101">
+                                    <label for="editPrereq4">ENG101 - English Composition</label>
+                                </div>
+                                <div class="prerequisite-item">
+                                    <input type="checkbox" id="editPrereq5" value="CHEM101">
+                                    <label for="editPrereq5">CHEM101 - Basic Chemistry</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveEditBtn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Management Modal -->
+    <div class="modal fade" id="studentManagementModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Student Management</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="studentSearch" placeholder="Search students...">
+                                <button class="btn btn-outline-secondary" type="button" onclick="searchStudents()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="courseFilter" onchange="filterStudentsByCourse()">
+                                <option value="">All Courses</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="studentTable">
+                            <thead>
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Name</th>
+                                    <th>Registered Courses</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody">
+                                <!-- Student rows will be dynamically added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Override Registration Modal -->
+    <div class="modal fade" id="overrideRegistrationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Override Course Registration</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="overrideForm">
+                        <input type="hidden" id="overrideStudentId">
+                        <div class="mb-3">
+                            <label for="overrideCourse" class="form-label">Select Course</label>
+                            <select class="form-select" id="overrideCourse" required>
+                                <!-- Course options will be dynamically added here -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="overrideReason" class="form-label">Reason for Override</label>
+                            <textarea class="form-control" id="overrideReason" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitOverride()">Submit Override</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Modal -->
+    <div class="modal fade" id="reportsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Reports</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Course Enrollment</h5>
+                                    <p class="card-text">View students registered for a specific course</p>
+                                    <button class="btn btn-primary" onclick="generateCourseEnrollmentReport()">Generate</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Available Seats</h5>
+                                    <p class="card-text">List all courses with their available seats</p>
+                                    <button class="btn btn-primary" onclick="generateAvailableSeatsReport()">Generate</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Missing Prerequisites</h5>
+                                    <p class="card-text">Find students with missing prerequisites</p>
+                                    <button class="btn btn-primary" onclick="generateMissingPrerequisitesReport()">Generate</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="reportContainer" class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 id="reportTitle">Select a report to generate</h5>
+                            <button id="exportReportBtn" class="btn btn-sm btn-success d-none">
+                                <i class="fas fa-file-export"></i> Export CSV
+                            </button>
+                        </div>
+                        <div id="reportContent" class="table-responsive">
+                            <!-- Report data will be displayed here -->
+                            <div class="alert alert-info">
+                                Click one of the report buttons above to generate a report.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/navbar.js"></script>
+    <script>
+        // Global variables
+        let students = [];
+        let courses = [];
+
+        // Fetch and display courses
+        async function fetchCourses() {
+            try {
+                const response = await fetch('/admin/courses');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch courses');
+                }
+                courses = await response.json();
+                displayCourses(courses);
+            } catch (error) {
+                console.error('Error fetching courses:', error);
+                alert('Failed to fetch courses');
+            }
+        }
+
+        // Display courses in cards
+        function displayCourses(courses) {
+            const courseList = document.getElementById('courseList');
+            courseList.innerHTML = '';
+            
+            courses.forEach(course => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4';
+                card.innerHTML = `
+                    <div class="card course-card">
+                        <button class="delete-btn" onclick="deleteCourse('${course._id}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <button class="edit-btn" onclick="editCourse('${course._id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="card-body">
+                            <h5 class="card-title">${course.courseName}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">${course.courseCode}</h6>
+                            <p class="card-text">${course.description || 'No description'}</p>
+                            <p class="card-text"><small class="text-muted">Schedule: ${course.scheduleDays.join(', ')}</small></p>
+                            <p class="card-text"><small class="text-muted">Time: ${course.scheduleTime}</small></p>
+                            <p class="card-text"><small class="text-muted">Seats: ${course.maxSeats || 30} (Max)</small></p>
+                            ${course.prerequisites && course.prerequisites.length > 0 ? `<p class="card-text"><small class="text-muted">Prerequisites: ${course.prerequisites.join(', ')}</small></p>` : ''}
+                        </div>
+                    </div>
+                `;
+                courseList.appendChild(card);
+            });
+        }
+
+        // Add new course
+        document.getElementById('addCourseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = {
+                courseName: document.getElementById('courseName').value,
+                courseCode: document.getElementById('courseCode').value,
+                description: document.getElementById('description').value,
+                scheduleDays: Array.from(document.getElementById('scheduleDays').selectedOptions).map(option => option.value),
+                scheduleTime: document.getElementById('scheduleTime').value,
+                maxSeats: document.getElementById('maxSeats').value,
+                prerequisites: Array.from(document.querySelectorAll('.prerequisites-list input[type="checkbox"]:checked'))
+                    .map(checkbox => checkbox.value)
+            };
+
+            try {
+                const response = await fetch('/admin/add-course', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add course');
+                }
+
+                // Reset form and refresh course list
+                document.getElementById('addCourseForm').reset();
+                fetchCourses();
+                alert('Course added successfully!');
+            } catch (error) {
+                console.error('Error adding course:', error);
+                alert('Failed to add course');
+            }
+        });
+
+        // Delete course
+        async function deleteCourse(courseId) {
+            if (confirm('Are you sure you want to delete this course?')) {
+                try {
+                    const response = await fetch(`/admin/courses/${courseId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete course');
+                    }
+
+                    fetchCourses();
+                    alert('Course deleted successfully!');
+                } catch (error) {
+                    console.error('Error deleting course:', error);
+                    alert('Failed to delete course');
+                }
+            }
+        }
+
+        // Edit course
+        async function editCourse(courseId) {
+            try {
+                const response = await fetch(`/admin/courses/${courseId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch course details');
+                }
+                const course = await response.json();
+                
+                // Populate edit form
+                document.getElementById('editCourseId').value = course._id;
+                document.getElementById('editCourseName').value = course.courseName;
+                document.getElementById('editCourseCode').value = course.courseCode;
+                document.getElementById('editDescription').value = course.description || '';
+                
+                // Set selected days
+                const scheduleDaysSelect = document.getElementById('editScheduleDays');
+                Array.from(scheduleDaysSelect.options).forEach(option => {
+                    option.selected = course.scheduleDays.includes(option.value);
+                });
+                
+                document.getElementById('editScheduleTime').value = course.scheduleTime;
+                
+                // Set max seats
+                document.getElementById('editMaxSeats').value = course.maxSeats || 30;
+
+                // Set prerequisites
+                const checkboxes = document.querySelectorAll('#editCourseModal .prerequisites-list input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = course.prerequisites && course.prerequisites.includes(checkbox.value);
+                });
+                
+                // Show modal
+                new bootstrap.Modal(document.getElementById('editCourseModal')).show();
+            } catch (error) {
+                console.error('Error fetching course details:', error);
+                alert('Failed to fetch course details');
+            }
+        }
+
+        // Save edited course
+        document.getElementById('saveEditBtn').addEventListener('click', async () => {
+            const courseId = document.getElementById('editCourseId').value;
+            const formData = {
+                courseName: document.getElementById('editCourseName').value,
+                courseCode: document.getElementById('editCourseCode').value,
+                description: document.getElementById('editDescription').value,
+                scheduleDays: Array.from(document.getElementById('editScheduleDays').selectedOptions).map(option => option.value),
+                scheduleTime: document.getElementById('editScheduleTime').value,
+                maxSeats: document.getElementById('editMaxSeats').value,
+                prerequisites: Array.from(document.querySelectorAll('#editCourseModal .prerequisites-list input[type="checkbox"]:checked'))
+                    .map(checkbox => checkbox.value)
+            };
+
+            try {
+                const response = await fetch(`/admin/courses/${courseId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update course');
+                }
+
+                // Close modal and refresh course list
+                bootstrap.Modal.getInstance(document.getElementById('editCourseModal')).hide();
+                fetchCourses();
+                alert('Course updated successfully!');
+            } catch (error) {
+                console.error('Error updating course:', error);
+                alert('Failed to update course');
+            }
+        });
+
+        // Fetch students
+        async function fetchStudents() {
+            try {
+                const response = await fetch('/admin/students');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch students');
+                }
+                students = await response.json();
+                displayStudents(students);
+                updateCourseFilter();
+            } catch (error) {
+                console.error('Error fetching students:', error);
+                alert('Failed to fetch students');
+            }
+        }
+
+        // Display students in the table
+        function displayStudents(studentsToDisplay) {
+            try {
+                const tbody = document.querySelector('#studentTable tbody');
+                tbody.innerHTML = '';
+                
+                if (!studentsToDisplay || !Array.isArray(studentsToDisplay) || studentsToDisplay.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">No students found</td></tr>';
+                    return;
+                }
+
+                studentsToDisplay.forEach(student => {
+                    if (!student) return;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${student.rollNumber || 'N/A'}</td>
+                        <td>${student.name || 'N/A'}</td>
+                        <td>${student.courseDetails && Array.isArray(student.courseDetails) && student.courseDetails.length > 0 ? 
+                            student.courseDetails.map(course => 
+                                `${course.courseCode} - ${course.courseName}`).join('<br>') : 
+                            'No courses registered'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="showOverrideModal('${student._id}')">
+                                Override Registration
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                console.log(`Displayed ${studentsToDisplay.length} students`);
+            } catch (error) {
+                console.error('Error displaying students:', error);
+                alert('Error displaying student data. Please check the console for details.');
+            }
+        }
+
+        // Update course filter dropdown
+        async function updateCourseFilter() {
+            try {
+                const response = await fetch('/admin/courses');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch courses');
+                }
+                courses = await response.json();
+                
+                const courseFilter = document.getElementById('courseFilter');
+                courseFilter.innerHTML = '<option value="">All Courses</option>';
+                
+                courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course._id; // Use course ID instead of code
+                    option.textContent = `${course.courseCode} - ${course.courseName}`;
+                    courseFilter.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching courses for filter:', error);
+            }
+        }
+
+        // Search students
+        function searchStudents() {
+            const searchTerm = document.getElementById('studentSearch').value.toLowerCase();
+            const filteredStudents = students.filter(student => 
+                (student.name && student.name.toLowerCase().includes(searchTerm)) ||
+                (student.rollNumber && student.rollNumber.toLowerCase().includes(searchTerm))
+            );
+            displayStudents(filteredStudents);
+        }
+
+        // Filter students by course
+        function filterStudentsByCourse() {
+            const selectedCourseId = document.getElementById('courseFilter').value;
+            if (!selectedCourseId) {
+                displayStudents(students);
+                return;
+            }
+
+            // Filter students who are registered for the selected course
+            const filteredStudents = students.filter(student => 
+                student.courseDetails && 
+                Array.isArray(student.courseDetails) &&
+                student.courseDetails.some(course => course._id === selectedCourseId)
+            );
+            
+            displayStudents(filteredStudents);
+        }
+
+        // Show override registration modal
+        async function showOverrideModal(studentId) {
+            try {
+                // Fetch the latest courses
+                const response = await fetch('/admin/courses');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch courses');
+                }
+                const courses = await response.json();
+                
+                // Find the student in our local data
+                const student = students.find(s => s._id === studentId);
+                if (!student) {
+                    throw new Error('Student not found in local data');
+                }
+
+                // Prepare the course dropdown
+                const courseSelect = document.getElementById('overrideCourse');
+                courseSelect.innerHTML = '';
+                
+                // Get the course IDs the student is already registered for
+                const registeredCourseIds = student.courseDetails && Array.isArray(student.courseDetails) ? 
+                    student.courseDetails.map(c => c._id) : [];
+                
+                courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course._id; // Use course ID
+                    option.textContent = `${course.courseCode} - ${course.courseName}`;
+                    
+                    // Disable if student is already registered for this course
+                    option.disabled = registeredCourseIds.includes(course._id);
+                    
+                    courseSelect.appendChild(option);
+                });
+
+                // Set student ID in the hidden field
+                document.getElementById('overrideStudentId').value = studentId;
+                
+                // Show the modal
+                new bootstrap.Modal(document.getElementById('overrideRegistrationModal')).show();
+            } catch (error) {
+                console.error('Error preparing override modal:', error);
+                alert('Failed to prepare override registration');
+            }
+        }
+
+        // Submit override registration
+        async function submitOverride() {
+            // Get form data
+            const studentId = document.getElementById('overrideStudentId').value;
+            const courseId = document.getElementById('overrideCourse').value;
+            const reason = document.getElementById('overrideReason').value;
+
+            if (!reason) {
+                alert('Please provide a reason for the override');
+                return;
+            }
+
+            try {
+                // Send the override request to the server
+                const response = await fetch('/admin/override-registration', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        studentId,
+                        courseId, // Use courseId instead of courseCode
+                        reason
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to override registration');
+                }
+
+                // Parse the response
+                const result = await response.json();
+                
+                // Update local student data
+                const studentIndex = students.findIndex(s => s._id === studentId);
+                if (studentIndex !== -1) {
+                    students[studentIndex] = result.student;
+                }
+
+                // Update display
+                displayStudents(students);
+                
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('overrideRegistrationModal')).hide();
+                
+                alert('Course registration overridden successfully');
+            } catch (error) {
+                console.error('Error overriding registration:', error);
+                alert(error.message || 'Failed to override course registration');
+            }
+        }
+
+        // Initialize when document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchCourses();
+            fetchStudents();
+        });
+
+        // Reports Functions
+        async function generateCourseEnrollmentReport() {
+            const reportTitle = document.getElementById('reportTitle');
+            const reportContent = document.getElementById('reportContent');
+            const exportBtn = document.getElementById('exportReportBtn');
+            
+            reportTitle.textContent = 'Loading...';
+            reportContent.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+            exportBtn.classList.add('d-none');
+            
+            try {
+                // Prepare course selection dropdown
+                reportContent.innerHTML = `
+                    <div class="form-group mb-3">
+                        <label for="reportCourseSelect" class="form-label">Select Course</label>
+                        <select class="form-select" id="reportCourseSelect" onchange="showCourseEnrollment(this.value)">
+                            <option value="">-- Select a course --</option>
+                            ${courses.map(course => `<option value="${course._id}">${course.courseCode} - ${course.courseName}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div id="courseEnrollmentData"></div>
+                `;
+                
+                reportTitle.textContent = 'Course Enrollment Report';
+            } catch (error) {
+                console.error('Error generating course enrollment report:', error);
+                reportContent.innerHTML = '<div class="alert alert-danger">Failed to generate report. Please try again.</div>';
+                reportTitle.textContent = 'Error';
+            }
+        }
+        
+        async function showCourseEnrollment(courseId) {
+            if (!courseId) {
+                document.getElementById('courseEnrollmentData').innerHTML = '';
+                document.getElementById('exportReportBtn').classList.add('d-none');
+                return;
+            }
+            
+            const enrollmentData = document.getElementById('courseEnrollmentData');
+            const exportBtn = document.getElementById('exportReportBtn');
+            
+            enrollmentData.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+            
+            try {
+                // Fetch enrollment data from API
+                const response = await fetch(`/admin/reports/enrollment/${courseId}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Failed to fetch enrollment data: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Display enrollment data
+                if (data.enrolledCount === 0) {
+                    enrollmentData.innerHTML = `<div class="alert alert-info">No students are currently enrolled in <strong>${data.course.courseCode} - ${data.course.courseName}</strong></div>`;
+                    exportBtn.classList.add('d-none');
+                } else {
+                    // Setup export functionality
+                    window.currentReportData = {
+                        type: 'enrollment',
+                        courseCode: data.course.courseCode,
+                        courseName: data.course.courseName,
+                        students: data.students
+                    };
+                    exportBtn.classList.remove('d-none');
+                    exportBtn.onclick = exportReportToCSV;
+                    
+                    // Display table
+                    enrollmentData.innerHTML = `
+                        <div class="alert alert-success mb-3">
+                            ${data.enrolledCount} student(s) enrolled in <strong>${data.course.courseCode} - ${data.course.courseName}</strong>
+                            (Maximum capacity: ${data.course.maxSeats})
+                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.students.map(student => `
+                                    <tr>
+                                        <td>${student.rollNumber || 'N/A'}</td>
+                                        <td>${student.name || 'N/A'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error showing course enrollment:', error);
+                enrollmentData.innerHTML = '<div class="alert alert-danger">Failed to load enrollment data. Please try again.</div>';
+                exportBtn.classList.add('d-none');
+            }
+        }
+        
+        async function generateAvailableSeatsReport() {
+            const reportTitle = document.getElementById('reportTitle');
+            const reportContent = document.getElementById('reportContent');
+            const exportBtn = document.getElementById('exportReportBtn');
+            
+            reportTitle.textContent = 'Loading...';
+            reportContent.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+            exportBtn.classList.add('d-none');
+            
+            try {
+                // Fetch available seats data from API
+                const response = await fetch('/admin/reports/available-seats');
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Failed to fetch available seats data: ${errorText}`);
+                }
+                
+                const coursesWithSeats = await response.json();
+                
+                // Setup export functionality
+                window.currentReportData = {
+                    type: 'seats',
+                    courses: coursesWithSeats
+                };
+                exportBtn.classList.remove('d-none');
+                exportBtn.onclick = exportReportToCSV;
+                
+                // Display report
+                reportContent.innerHTML = `
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Course Name</th>
+                                <th>Schedule</th>
+                                <th>Enrolled</th>
+                                <th>Available</th>
+                                <th>Max Capacity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${coursesWithSeats.map(course => {
+                                let statusBadge;
+                                if (course.availableSeats <= 0) {
+                                    statusBadge = '<span class="badge bg-danger">Full</span>';
+                                } else if (course.availableSeats / course.maxSeats <= 0.2) {
+                                    statusBadge = '<span class="badge bg-warning text-dark">Limited</span>';
+                                } else {
+                                    statusBadge = '<span class="badge bg-success">Available</span>';
+                                }
+                                
+                                return `
+                                    <tr>
+                                        <td>${course.courseCode}</td>
+                                        <td>${course.courseName}</td>
+                                        <td>${course.scheduleDays.join(', ')} at ${course.scheduleTime}</td>
+                                        <td>${course.enrolled}</td>
+                                        <td>${course.availableSeats}</td>
+                                        <td>${course.maxSeats}</td>
+                                        <td>${statusBadge}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+                
+                reportTitle.textContent = 'Available Seats Report';
+            } catch (error) {
+                console.error('Error generating available seats report:', error);
+                reportContent.innerHTML = '<div class="alert alert-danger">Failed to generate report. Please try again.</div>';
+                reportTitle.textContent = 'Error';
+                exportBtn.classList.add('d-none');
+            }
+        }
+        
+        async function generateMissingPrerequisitesReport() {
+            const reportTitle = document.getElementById('reportTitle');
+            const reportContent = document.getElementById('reportContent');
+            const exportBtn = document.getElementById('exportReportBtn');
+            
+            reportTitle.textContent = 'Loading...';
+            reportContent.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+            exportBtn.classList.add('d-none');
+            
+            try {
+                // Fetch missing prerequisites data from API
+                const response = await fetch('/admin/reports/missing-prerequisites');
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Failed to fetch missing prerequisites data: ${errorText}`);
+                }
+                
+                const studentsWithIssues = await response.json();
+                
+                // Setup export functionality
+                window.currentReportData = {
+                    type: 'prerequisites',
+                    students: studentsWithIssues
+                };
+                exportBtn.classList.remove('d-none');
+                exportBtn.onclick = exportReportToCSV;
+                
+                // Display report
+                if (studentsWithIssues.length === 0) {
+                    reportContent.innerHTML = '<div class="alert alert-success">No students with missing prerequisites found.</div>';
+                    exportBtn.classList.add('d-none');
+                } else {
+                    reportContent.innerHTML = `
+                        <div class="alert alert-warning mb-3">
+                            Found ${studentsWithIssues.length} student(s) with missing prerequisites
+                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Roll Number</th>
+                                    <th>Course</th>
+                                    <th>Missing Prerequisites</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${studentsWithIssues.map(item => 
+                                    item.issues.map(issue => `
+                                        <tr>
+                                            <td>${item.student.name}</td>
+                                            <td>${item.student.rollNumber}</td>
+                                            <td>${issue.course.courseCode} - ${issue.course.courseName}</td>
+                                            <td>${issue.missingPrerequisites.join(', ')}</td>
+                                        </tr>
+                                    `).join('')
+                                ).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+                
+                reportTitle.textContent = 'Missing Prerequisites Report';
+            } catch (error) {
+                console.error('Error generating missing prerequisites report:', error);
+                reportContent.innerHTML = '<div class="alert alert-danger">Failed to generate report. Please try again.</div>';
+                reportTitle.textContent = 'Error';
+                exportBtn.classList.add('d-none');
+            }
+        }
+        
+        // Export report to CSV
+        function exportReportToCSV() {
+            try {
+                const data = window.currentReportData;
+                if (!data) throw new Error('No report data to export');
+                
+                let csvContent = '';
+                let filename = '';
+                
+                // Format based on report type
+                if (data.type === 'enrollment') {
+                    filename = `enrollment_${data.courseCode.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+                    csvContent = 'Roll Number,Name\n';
+                    data.students.forEach(student => {
+                        csvContent += `${student.rollNumber || 'N/A'},"${student.name || 'N/A'}"\n`;
+                    });
+                } 
+                else if (data.type === 'seats') {
+                    filename = `available_seats_${new Date().toISOString().split('T')[0]}.csv`;
+                    csvContent = 'Course Code,Course Name,Schedule,Enrolled,Available,Max Capacity,Status\n';
+                    data.courses.forEach(course => {
+                        const status = course.availableSeats <= 0 ? 'Full' : 
+                                     (course.availableSeats / course.maxSeats <= 0.2 ? 'Limited' : 'Available');
+                        csvContent += `${course.courseCode},"${course.courseName}","${course.scheduleDays.join(', ')} at ${course.scheduleTime}",${course.enrolled},${course.availableSeats},${course.maxSeats},${status}\n`;
+                    });
+                }
+                else if (data.type === 'prerequisites') {
+                    filename = `missing_prerequisites_${new Date().toISOString().split('T')[0]}.csv`;
+                    csvContent = 'Student,Roll Number,Course,Missing Prerequisites\n';
+                    data.students.forEach(item => {
+                        item.issues.forEach(issue => {
+                            csvContent += `"${item.student.name || 'N/A'}","${item.student.rollNumber || 'N/A'}","${issue.course.courseCode} - ${issue.course.courseName}","${issue.missingPrerequisites.join(', ')}"\n`;
+                        });
+                    });
+                }
+                
+                // Create download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (error) {
+                console.error('Error exporting report:', error);
+                alert('Failed to export report. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>

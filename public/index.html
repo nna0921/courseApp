@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Registration System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="navbar.css">
+    <style>
+        .login-wrapper {
+            margin-top: 20px;
+            position: relative;
+            min-height: 380px;
+            width: 100%;
+        }
+        
+        .login-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-toggle {
+            background: #e0f2f1;
+            border-radius: 30px;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 2px solid #00897b;
+        }
+        
+        .login-toggle label {
+            color: #455a64;
+            cursor: pointer;
+            padding: 12px 30px;
+            position: relative;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            z-index: 1;
+        }
+        
+        .login-toggle label:hover {
+            color: #00695c;
+        }
+        
+        .login-slider {
+            background-color: #00897b;
+            border-radius: 30px;
+            height: 100%;
+            left: 0;
+            position: absolute;
+            transition: all 0.3s ease;
+            width: 50%;
+        }
+        
+        #student-toggle:checked ~ .login-slider {
+            left: 0;
+        }
+        
+        #admin-toggle:checked ~ .login-slider {
+            left: 50%;
+        }
+        
+        .login-toggle input[type="radio"]:checked + label {
+            color: white;
+        }
+        
+        .login-toggle input[type="radio"] {
+            display: none;
+        }
+        
+        .login-section {
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            background-color: #e0f2f1;
+            padding: 20px;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        
+        .login-section.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .login-section h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        /* Animation for the switching */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .login-section.active {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .help-text {
+            margin-top: 8px;
+            display: block;
+        }
+        
+        h1.page-title {
+            color: #00695c;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #607d8b;
+            margin-bottom: 25px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img src="images/course-map-logo.svg" alt="Course Map Logo">
+            <h1>CourseBot</h1>
+        </div>
+        <ul class="navbar-links">
+            <li><a href="/" class="active">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Welcome to CourseBot</h1>
+        <p class="subtitle">Your smart course registration assistant</p>
+        
+        <div class="login-wrapper">
+            <!-- Login type selector -->
+            <div class="login-selector">
+                <div class="login-toggle">
+                    <input type="radio" id="student-toggle" name="login-type" checked>
+                    <label for="student-toggle">Student</label>
+                    
+                    <input type="radio" id="admin-toggle" name="login-type">
+                    <label for="admin-toggle">Admin</label>
+                    
+                    <span class="login-slider"></span>
+                </div>
+            </div>
+            
+            <!-- Student Login -->
+            <div id="student-login" class="login-section active">
+                <h2>Student Login</h2>
+                <div class="form-group">
+                    <label for="studentRollNumber">Roll Number:</label>
+                    <input type="text" id="studentRollNumber" placeholder="Enter Roll Number (e.g., S12345)">
+                </div>
+                <div class="form-group">
+                    <p class="note">Default Password: student123</p>
+                </div>
+                <button id="studentLoginBtn">Login as Student</button>
+            </div>
+            
+            <!-- Admin Login -->
+            <div id="admin-login" class="login-section">
+                <h2>Admin Login</h2>
+                <div class="form-group">
+                    <label for="adminUsername">Username:</label>
+                    <input type="text" id="adminUsername" placeholder="Enter Username">
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Password:</label>
+                    <input type="password" id="adminPassword" placeholder="Enter Password">
+                </div>
+                <button id="adminLoginBtn">Login as Admin</button>
+                <p class="help-text">Admin credentials: admin / admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/navbar.js"></script>
+    <script src="./js/auth.js"></script>
+    <script>
+        document.getElementById("studentLoginBtn").addEventListener("click", studentLogin);
+        document.getElementById("adminLoginBtn").addEventListener("click", adminLogin);
+        
+        // Login type toggle functionality
+        document.getElementById('student-toggle').addEventListener('change', function() {
+            document.getElementById('student-login').classList.add('active');
+            document.getElementById('admin-login').classList.remove('active');
+        });
+        
+        document.getElementById('admin-toggle').addEventListener('change', function() {
+            document.getElementById('admin-login').classList.add('active');
+            document.getElementById('student-login').classList.remove('active');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+.navbar {
+    background-color: #00897b; /* Teal color */
+    background-image: linear-gradient(to right, #00897b, #00695c);
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    height: 65px;
+    min-height: 65px;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo img {
+    height: 50px;
+    width: auto;
+    margin-right: 15px;
+    transition: transform 0.3s ease;
+}
+
+.navbar-logo img:hover {
+    transform: scale(1.05);
+}
+
+.navbar-logo h1 {
+    color: white;
+    margin: 0;
+    font-size: 1.7rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    margin-right: 25px; /* Add margin to the right to prevent viewport overflow */
+}
+
+.navbar-links li {
+    margin-left: 25px;
+    position: relative;
+}
+
+.navbar-links a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    padding: 5px 2px;
+    display: block;
+}
+
+.navbar-links a:hover, .navbar-links a.active {
+    color: #e0f2f1; /* Lighter teal for hover state */
+}
+
+.navbar-links a:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #e0f2f1;
+    transition: width 0.3s ease;
+}
+
+.navbar-links a:hover:after, .navbar-links a.active:after {
+    width: 100%;
+}
+
+/* Add spacing below the navbar for content */
+body {
+    padding-top: 70px;
+}
+
+/* Bootstrap-specific adjustments */
+.bootstrap-container, .container.mt-4 {
+    margin-top: 20px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        padding: 0.8rem;
+        height: auto;
+    }
+    
+    .navbar-links {
+        margin-top: 15px;
+    }
+    
+    .navbar-links li {
+        margin-left: 15px;
+        margin-right: 15px;
+    }
+} 

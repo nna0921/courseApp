@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/dashboard.css">
+    <link rel="stylesheet" href="/navbar.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img src="/images/course-map-logo.svg" alt="Course Map Logo">
+            <h1>CourseBot</h1>
+        </div>
+        <ul class="navbar-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/student/dashboard" class="active">Dashboard</a></li>
+            <li><a href="/student/courses">My Courses</a></li>
+            <li><a href="#" onclick="logout(); return false;">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Welcome, <%= student.name %></h1>
+        
+        <div id="dashboard-container">
+            <div class="row mt-4">
+                <!-- Calendar will be loaded here -->
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Weekly Schedule</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Course filters and search -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Course Filters</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="departmentFilter" class="form-label">Department</label>
+                                <select id="departmentFilter" class="form-select">
+                                    <option value="">All Departments</option>
+                                    <% departments.forEach(dept => { %>
+                                        <option value="<%= dept %>"><%= dept %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="courseLevelFilter" class="form-label">Course Level</label>
+                                <select id="courseLevelFilter" class="form-select">
+                                    <option value="">All Levels</option>
+                                    <% courseLevels.forEach(level => { %>
+                                        <option value="<%= level %>"><%= level %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="timeFilter" class="form-label">Time of Day</label>
+                                <select id="timeFilter" class="form-select">
+                                    <option value="">Any Time</option>
+                                    <option value="morning">Morning (8:00-12:00)</option>
+                                    <option value="afternoon">Afternoon (12:00-17:00)</option>
+                                    <option value="evening">Evening (17:00-21:00)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="daysFilter" class="form-label">Days of Week</label>
+                                <select id="daysFilter" class="form-select">
+                                    <option value="">Any Day</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="openSeatsFilter">
+                                <label class="form-check-label" for="openSeatsFilter">
+                                    Open Seats Only
+                                </label>
+                            </div>
+                            
+                            <button id="applyFiltersBtn" class="btn btn-primary">Apply Filters</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Available Courses -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3>Available Courses</h3>
+                            <div id="courseCount" class="badge bg-info"></div>
+                        </div>
+                        <div class="card-body">
+                            <div id="coursesContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Registered Courses -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>My Registered Courses</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="registeredCoursesContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course confirmation modal -->
+    <div class="modal fade" id="courseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Course Registration</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to <span id="actionType"></span> <strong id="modalCourseTitle"></strong>?</p>
+                    <div id="prerequisiteWarning" class="alert alert-warning d-none">
+                        <h6>Missing Prerequisites:</h6>
+                        <ul id="missingPrerequisitesList"></ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmCourseAction">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="/js/navbar.js"></script>
+    <script>
+        // Base data structures
+        let allCourses = [];
+        let registeredCourses = [];
+        let temporarySchedule = [];
+        let calendar;
+        
+        // DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCalendar();
+            fetchCourses();
+            fetchRegisteredCourses();
+            
+            // Event listeners
+            document.getElementById('applyFiltersBtn').addEventListener('click', filterCourses);
+            document.querySelectorAll('#departmentFilter, #courseLevelFilter, #timeFilter, #daysFilter, #openSeatsFilter')
+                .forEach(filter => filter.addEventListener('change', filterCourses));
+        });
+        
+        // Initialize calendar
+        function initializeCalendar() {
+            const calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                headerToolbar: {
+                    left: 'title',
+                    right: 'timeGridWeek,timeGridDay'
+                },
+                slotMinTime: '08:00:00',
+                slotMaxTime: '21:00:00',
+                allDaySlot: false,
+                height: 'auto',
+                editable: false,
+                eventClick: function(info) {
+                    // Show course details when clicking an event
+                    alert(`Course: ${info.event.title}\nTime: ${info.event.extendedProps.time}\nRoom: ${info.event.extendedProps.room || 'TBD'}`);
+                },
+                eventDidMount: function(info) {
+                    // Add tooltip for events
+                    if (info.event.extendedProps.conflict) {
+                        info.el.style.backgroundColor = 'red';
+                        info.el.style.borderColor = 'darkred';
+                    }
+                }
+            });
+            
+            calendar.render();
+        }
+        
+        // Fetch available courses
+        async function fetchCourses() {
+            try {
+                const response = await fetch('/student/courses');
+                if (!response.ok) throw new Error('Failed to fetch courses');
+                
+                allCourses = await response.json();
+                filterCourses(); // Apply initial filters (none)
+            } catch (error) {
+                console.error('Error fetching courses:', error);
+                document.getElementById('coursesContainer').innerHTML = 
+                    '<div class="alert alert-danger">Failed to load courses. Please try again later.</div>';
+            }
+        }
+        
+        // Fetch registered courses
+        async function fetchRegisteredCourses() {
+            try {
+                console.log('Fetching registered courses...');
+                const response = await fetch('/student/my-courses');
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server error:', errorText);
+                    throw new Error(`Failed to fetch registered courses: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Registered courses data:', data);
+                
+                // Verify data structure
+                if (!Array.isArray(data)) {
+                    console.error('Invalid data format, expected array:', data);
+                    throw new Error('Invalid data format received from server');
+                }
+                
+                // Ensure each course has required properties
+                registeredCourses = data.map(course => {
+                    // Ensure _id is always a string
+                    if (course._id && typeof course._id !== 'string') {
+                        course._id = course._id.toString();
+                    }
+                    
+                    // Ensure scheduleDays is always an array
+                    if (!course.scheduleDays || !Array.isArray(course.scheduleDays)) {
+                        course.scheduleDays = [];
+                    }
+                    
+                    return course;
+                });
+                
+                displayRegisteredCourses();
+                updateCalendar();
+            } catch (error) {
+                console.error('Error fetching registered courses:', error);
+                document.getElementById('registeredCoursesContainer').innerHTML = 
+                    '<div class="alert alert-danger">Failed to load registered courses. Please try again later.</div>';
+                // Initialize empty array if error occurs
+                registeredCourses = [];
+            }
+        }
+        
+        // Filter courses based on selected criteria
+        function filterCourses() {
+            const departmentFilter = document.getElementById('departmentFilter').value;
+            const courseLevelFilter = document.getElementById('courseLevelFilter').value;
+            const timeFilter = document.getElementById('timeFilter').value;
+            const daysFilter = document.getElementById('daysFilter').value;
+            const openSeatsOnly = document.getElementById('openSeatsFilter').checked;
+            
+            // Filter the courses
+            const filteredCourses = allCourses.filter(course => {
+                // Department filter
+                if (departmentFilter && !course.courseCode.startsWith(departmentFilter)) {
+                    return false;
+                }
+                
+                // Course level filter
+                if (courseLevelFilter) {
+                    const courseLevel = course.courseCode.match(/\d+/)[0].charAt(0) + "00";
+                    if (courseLevel !== courseLevelFilter) {
+                        return false;
+                    }
+                }
+                
+                // Time of day filter
+                if (timeFilter) {
+                    const timeHour = parseInt(course.scheduleTime.split(':')[0]);
+                    if (timeFilter === 'morning' && (timeHour < 8 || timeHour >= 12)) {
+                        return false;
+                    } else if (timeFilter === 'afternoon' && (timeHour < 12 || timeHour >= 17)) {
+                        return false;
+                    } else if (timeFilter === 'evening' && (timeHour < 17 || timeHour >= 21)) {
+                        return false;
+                    }
+                }
+                
+                // Days filter
+                if (daysFilter && !course.scheduleDays.includes(daysFilter)) {
+                    return false;
+                }
+                
+                // Open seats filter
+                if (openSeatsOnly && course.availableSeats <= 0) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            displayCourses(filteredCourses);
+        }
+        
+        // Display available courses
+        function displayCourses(courses) {
+            try {
+                const courseContainer = document.getElementById('coursesContainer');
+                if (!courseContainer) {
+                    console.error('Course container element not found');
+                    return;
+                }
+                
+                const courseCountElement = document.getElementById('courseCount');
+                
+                courseContainer.innerHTML = '';
+                
+                // Verify courses is valid
+                if (!courses || !Array.isArray(courses)) {
+                    console.error('Invalid courses data:', courses);
+                    courseContainer.innerHTML = '<div class="alert alert-warning">Could not load course data. Please refresh the page.</div>';
+                    if (courseCountElement) courseCountElement.textContent = '0 courses';
+                    return;
+                }
+                
+                if (courseCountElement) {
+                    courseCountElement.textContent = courses.length + ' courses';
+                }
+                
+                if (courses.length === 0) {
+                    courseContainer.innerHTML = '<div class="alert alert-info">No courses match your filters.</div>';
+                    return;
+                }
+                
+                // Create course cards
+                courses.forEach(course => {
+                    if (!course) return; // Skip invalid courses
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card mb-3';
+                    
+                    // Check if already registered - Fix: Compare string IDs and handle nulls
+                    const isRegistered = registeredCourses && Array.isArray(registeredCourses) ? 
+                        registeredCourses.some(c => c && c._id && course && course._id && 
+                            c._id.toString() === course._id.toString()) : false;
+                    
+                    // Build card content
+                    let cardContent = `
+                        <div class="card-header">
+                            <h5>${course.courseCode || 'Unknown'} - ${course.courseName || 'Unknown'}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>${course.description || 'No description available.'}</p>
+                            <p><strong>Schedule:</strong> ${
+                                course.scheduleDays && Array.isArray(course.scheduleDays) ? 
+                                course.scheduleDays.join(', ') : 'N/A'} at ${course.scheduleTime || 'N/A'}</p>
+                            <p class="seat-info ${(course.availableSeats !== undefined && course.availableSeats <= 5) ? 'text-danger' : ''}">
+                                <strong>Available Seats:</strong> ${course.availableSeats !== undefined ? course.availableSeats : 'N/A'} of ${course.maxSeats || 30}
+                            </p>
+                    `;
+                    
+                    // Add prerequisites if any
+                    if (course.prerequisites && Array.isArray(course.prerequisites) && course.prerequisites.length > 0) {
+                        cardContent += `
+                            <div class="prerequisites">
+                                <strong>Prerequisites:</strong>
+                                <ul>
+                                    ${course.prerequisites.map(prereq => `<li>${prereq || 'Unknown'}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+                    
+                    // Add registration button
+                    if (course._id) { // Only if course has valid ID
+                        cardContent += `
+                            <div class="text-end mt-3">
+                                ${isRegistered ? 
+                                    `<button class="btn btn-danger" onclick="showDropModal('${course._id}', '${(course.courseName || '').replace(/'/g, "\\'")}')">Drop Course</button>` : 
+                                    `<button class="btn btn-success ${!course.hasPrerequisites ? 'disabled' : ''}" 
+                                        onclick="showRegisterModal('${course._id}', '${(course.courseName || '').replace(/'/g, "\\'")}', ${!!course.hasPrerequisites})" 
+                                        ${!course.hasPrerequisites ? 'title="Missing prerequisites"' : ''}>
+                                        Register
+                                    </button>`
+                                }
+                            </div>
+                        </div>`;
+                    } else {
+                        cardContent += `</div>`;
+                    }
+                    
+                    card.innerHTML = cardContent;
+                    courseContainer.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error displaying courses:', error);
+                const container = document.getElementById('coursesContainer');
+                if (container) {
+                    container.innerHTML = '<div class="alert alert-danger">Error displaying courses. Please refresh the page.</div>';
+                }
+            }
+        }
+        
+        // Display registered courses
+        function displayRegisteredCourses() {
+            try {
+                const container = document.getElementById('registeredCoursesContainer');
+                if (!container) {
+                    console.error('Container element not found');
+                    return;
+                }
+                
+                container.innerHTML = '';
+                
+                // Verify registeredCourses is valid
+                if (!registeredCourses || !Array.isArray(registeredCourses)) {
+                    console.error('Invalid registeredCourses data:', registeredCourses);
+                    container.innerHTML = '<div class="alert alert-warning">Could not load course data. Please refresh the page.</div>';
+                    return;
+                }
+                
+                if (registeredCourses.length === 0) {
+                    container.innerHTML = '<div class="alert alert-info">You are not registered for any courses.</div>';
+                    return;
+                }
+                
+                const table = document.createElement('table');
+                table.className = 'table table-striped';
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Schedule</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+                
+                registeredCourses.forEach(course => {
+                    if (!course) return; // Skip invalid courses
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${course.courseCode || 'N/A'}</td>
+                        <td>${course.courseName || 'N/A'}</td>
+                        <td>${(course.scheduleDays && Array.isArray(course.scheduleDays) ? 
+                               course.scheduleDays.join(', ') : 'N/A')} at ${course.scheduleTime || 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" 
+                                onclick="showDropModal('${course._id || ''}', '${(course.courseName || '').replace(/'/g, "\\'")}')">
+                                Drop
+                            </button>
+                        </td>
+                    `;
+                    
+                    const tbody = table.querySelector('tbody');
+                    if (tbody) {
+                        tbody.appendChild(row);
+                    }
+                });
+                
+                container.appendChild(table);
+            } catch (error) {
+                console.error('Error displaying registered courses:', error);
+                const container = document.getElementById('registeredCoursesContainer');
+                if (container) {
+                    container.innerHTML = '<div class="alert alert-danger">Error displaying courses. Please refresh the page.</div>';
+                }
+            }
+        }
+        
+        // Update calendar with course schedule
+        function updateCalendar() {
+            try {
+                // Remove previous events
+                calendar.getEvents().forEach(event => event.remove());
+                
+                // Check if registeredCourses is valid
+                if (!registeredCourses || !Array.isArray(registeredCourses) || registeredCourses.length === 0) {
+                    console.log('No registered courses to display on calendar');
+                    return;
+                }
+                
+                // Generate events from registered courses
+                registeredCourses.forEach(course => {
+                    // Validate course data
+                    if (!course || !course.scheduleDays || !Array.isArray(course.scheduleDays)) {
+                        console.warn('Invalid course schedule data:', course);
+                        return; // Skip this course
+                    }
+                    
+                    // Create event for each schedule day
+                    course.scheduleDays.forEach(day => {
+                        try {
+                            // Validate schedule time
+                            if (!course.scheduleTime || !course.scheduleTime.includes('-')) {
+                                console.warn(`Invalid schedule time format for course ${course.courseCode}:`, course.scheduleTime);
+                                return; // Skip this day
+                            }
+                            
+                            // Parse time (assuming format like "10:00-12:00")
+                            const [startTime, endTime] = course.scheduleTime.split('-');
+                            
+                            // Map day name to day index (0 = Sunday, 1 = Monday, etc.)
+                            const dayMap = {
+                                'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3,
+                                'Thursday': 4, 'Friday': 5, 'Saturday': 6
+                            };
+                            
+                            // Validate day name
+                            if (dayMap[day] === undefined) {
+                                console.warn(`Invalid day name for course ${course.courseCode}:`, day);
+                                return; // Skip this day
+                            }
+                            
+                            // Create event
+                            calendar.addEvent({
+                                title: `${course.courseCode} - ${course.courseName}`,
+                                startTime: startTime.trim(),
+                                endTime: endTime.trim(),
+                                daysOfWeek: [dayMap[day]],
+                                extendedProps: {
+                                    courseId: course._id ? course._id.toString() : '',
+                                    room: course.room || 'TBD',
+                                    time: course.scheduleTime
+                                },
+                                backgroundColor: getRandomColor(course.courseCode)
+                            });
+                        } catch (err) {
+                            console.error(`Error creating calendar event for course ${course.courseCode} on ${day}:`, err);
+                        }
+                    });
+                });
+                
+                // Check for scheduling conflicts
+                checkScheduleConflicts();
+            } catch (error) {
+                console.error('Error updating calendar:', error);
+            }
+        }
+        
+        // Display registration modal
+        function showRegisterModal(courseId, courseName, hasPrerequisites) {
+            const modalTitle = document.getElementById('modalCourseTitle');
+            const actionType = document.getElementById('actionType');
+            const prerequisiteWarning = document.getElementById('prerequisiteWarning');
+            
+            modalTitle.textContent = courseName;
+            actionType.textContent = 'register for';
+            
+            // Show/hide prerequisite warning
+            if (!hasPrerequisites) {
+                prerequisiteWarning.classList.remove('d-none');
+                // Populate missing prerequisites - Fix: Compare string IDs
+                const course = allCourses.find(c => c._id.toString() === courseId.toString());
+                const missingList = document.getElementById('missingPrerequisitesList');
+                missingList.innerHTML = '';
+                
+                if (course && course.prerequisites) {
+                    course.prerequisites.forEach(prereq => {
+                        const li = document.createElement('li');
+                        li.textContent = prereq;
+                        missingList.appendChild(li);
+                    });
+                }
+            } else {
+                prerequisiteWarning.classList.add('d-none');
+            }
+            
+            // Setup confirmation button
+            const confirmBtn = document.getElementById('confirmCourseAction');
+            confirmBtn.onclick = () => registerCourse(courseId);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('courseModal'));
+            modal.show();
+        }
+        
+        // Display drop course modal
+        function showDropModal(courseId, courseName) {
+            const modalTitle = document.getElementById('modalCourseTitle');
+            const actionType = document.getElementById('actionType');
+            const prerequisiteWarning = document.getElementById('prerequisiteWarning');
+            
+            modalTitle.textContent = courseName;
+            actionType.textContent = 'drop';
+            prerequisiteWarning.classList.add('d-none');
+            
+            // Setup confirmation button
+            const confirmBtn = document.getElementById('confirmCourseAction');
+            confirmBtn.onclick = () => dropCourse(courseId);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('courseModal'));
+            modal.show();
+        }
+        
+        // Register for a course
+        async function registerCourse(courseId) {
+            try {
+                const response = await fetch('/student/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ courseId })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Update registered courses
+                    registeredCourses = result.courses;
+                    
+                    // Refresh display
+                    displayRegisteredCourses();
+                    updateCalendar();
+                    
+                    // Re-fetch all courses to update availability
+                    fetchCourses();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('courseModal')).hide();
+                } else {
+                    alert(result.error || 'Failed to register for course');
+                }
+            } catch (error) {
+                console.error('Error registering for course:', error);
+                alert('An error occurred. Please try again later.');
+            }
+        }
+        
+        // Drop a course
+        async function dropCourse(courseId) {
+            try {
+                const response = await fetch('/student/drop', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ courseId })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Update registered courses
+                    registeredCourses = result.courses;
+                    
+                    // Refresh display
+                    displayRegisteredCourses();
+                    updateCalendar();
+                    
+                    // Re-fetch all courses to update availability
+                    fetchCourses();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('courseModal')).hide();
+                } else {
+                    alert(result.error || 'Failed to drop course');
+                }
+            } catch (error) {
+                console.error('Error dropping course:', error);
+                alert('An error occurred. Please try again later.');
+            }
+        }
+        
+        // Check for scheduling conflicts
+        function checkScheduleConflicts() {
+            try {
+                const events = calendar.getEvents();
+                const conflicts = [];
+                
+                // Compare each event with others to find overlaps
+                events.forEach(event1 => {
+                    events.forEach(event2 => {
+                        if (event1 !== event2 && 
+                            event1.daysOfWeek && event2.daysOfWeek && 
+                            event1.daysOfWeek[0] === event2.daysOfWeek[0]) {
+                            
+                            // Check time overlap (safely handle missing properties)
+                            const start1 = event1.startTime ? parseTime(event1.startTime) : 0;
+                            const end1 = event1.endTime ? parseTime(event1.endTime) : 0;
+                            const start2 = event2.startTime ? parseTime(event2.startTime) : 0;
+                            const end2 = event2.endTime ? parseTime(event2.endTime) : 0;
+                            
+                            if (start1 < end2 && start2 < end1) {
+                                conflicts.push(event1);
+                                conflicts.push(event2);
+                            }
+                        }
+                    });
+                });
+                
+                // Mark conflicts
+                conflicts.forEach(event => {
+                    event.setExtendedProp('conflict', true);
+                    event.setProp('backgroundColor', 'red');
+                    event.setProp('borderColor', 'darkred');
+                });
+            } catch (error) {
+                console.error('Error checking schedule conflicts:', error);
+            }
+        }
+        
+        // Parse time string to minutes since midnight
+        function parseTime(timeStr) {
+            try {
+                if (!timeStr || typeof timeStr !== 'string') return 0;
+                
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                if (isNaN(hours) || isNaN(minutes)) return 0;
+                
+                return hours * 60 + minutes;
+            } catch (error) {
+                console.error('Error parsing time:', timeStr, error);
+                return 0;
+            }
+        }
+        
+        // Get random color based on course code
+        function getRandomColor(courseCode) {
+            // Generate a color based on the hash of the course code
+            let hash = 0;
+            for (let i = 0; i < courseCode.length; i++) {
+                hash = courseCode.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            // Generate color components
+            const h = hash % 360;
+            return `hsl(${h}, 70%, 60%)`;
+        }
+        
+        // Logout function
+        function logout() {
+            fetch('/auth/logout', {
+                method: 'POST'
+            }).then(() => {
+                window.location.href = '/';
+            });
+        }
+    </script>
+</body>
+</html> 

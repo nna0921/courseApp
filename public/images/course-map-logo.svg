@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="200" height="200">
+  <!-- Open book -->
+  <g>
+    <path d="M136 235 L136 348 L250 348 L250 250 L136 235 Z" fill="#b0dcd7"/>
+    <path d="M250 250 L250 348 L364 348 L364 235 L250 250 Z" fill="#b0dcd7"/>
+    
+    <!-- Book binding -->
+    <rect x="245" y="250" width="10" height="98" fill="#ffffff"/>
+    
+    <!-- Book outline left -->
+    <path d="M125 225 L125 360 L250 360 L250 240 Z" fill="none" stroke="#00897b" stroke-width="10"/>
+    <!-- Book outline right -->
+    <path d="M250 240 L250 360 L375 360 L375 225 Z" fill="none" stroke="#00897b" stroke-width="10"/>
+    
+    <!-- Book shadow bottom -->
+    <path d="M125 360 Q138 370, 250 370 Q362 370, 375 360" fill="none" stroke="#222222" stroke-width="10"/>
+  </g>
+
+  <!-- Star at top -->
+  <polygon points="250,95 270,140 320,140 280,170 300,215 250,190 200,215 220,170 180,140 230,140" fill="#ffcb05"/>
+
+  <!-- Book lines -->
+  <line x1="160" y1="270" x2="230" y2="270" stroke="#455a64" stroke-width="6"/>
+  <line x1="160" y1="290" x2="230" y2="290" stroke="#455a64" stroke-width="6"/>
+  <line x1="160" y1="310" x2="230" y2="310" stroke="#455a64" stroke-width="6"/>
+
+  <line x1="270" y1="270" x2="340" y2="270" stroke="#455a64" stroke-width="6"/>
+  <line x1="270" y1="290" x2="340" y2="290" stroke="#455a64" stroke-width="6"/>
+  <line x1="270" y1="310" x2="340" y2="310" stroke="#455a64" stroke-width="6"/>
+
+  <!-- Laurel Leaves left -->
+  <g fill="#00897b">
+    <path d="M50,250 Q80,210 90,250 Q60,290 50,250 Z"/>
+    <path d="M60,270 Q95,240 100,280 Q65,310 60,270 Z"/>
+    <path d="M70,290 Q105,265 110,305 Q75,330 70,290 Z"/>
+    <path d="M85,310 Q120,285 125,325 Q90,350 85,310 Z"/>
+    <path d="M100,330 Q135,305 140,345 Q105,370 100,330 Z"/>
+  </g>
+
+  <!-- Laurel Leaves right -->
+  <g fill="#00897b">
+    <path d="M450,250 Q420,210 410,250 Q440,290 450,250 Z"/>
+    <path d="M440,270 Q405,240 400,280 Q435,310 440,270 Z"/>
+    <path d="M430,290 Q395,265 390,305 Q425,330 430,290 Z"/>
+    <path d="M415,310 Q380,285 375,325 Q410,350 415,310 Z"/>
+    <path d="M400,330 Q365,305 360,345 Q395,370 400,330 Z"/>
+  </g>
+
+  <!-- Banner with text -->
+  <path d="M160,345 Q250,365 340,345 L340,380 Q250,400 160,380 Z" fill="#00897b"/>
+  <text x="250" y="370" fill="#ffffff" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle">COURSE MAP</text>
+
+  <!-- Stars at bottom -->
+  <g fill="#ffcb05">
+    <polygon points="205,385 210,395 222,395 213,405 216,415 205,410 194,415 197,405 188,395 200,395"/>
+    <polygon points="230,385 235,395 247,395 238,405 241,415 230,410 219,415 222,405 213,395 225,395"/>
+    <polygon points="255,385 260,395 272,395 263,405 266,415 255,410 244,415 247,405 238,395 250,395"/>
+    <polygon points="280,385 285,395 297,395 288,405 291,415 280,410 269,415 272,405 263,395 275,395"/>
+    <polygon points="305,385 310,395 322,395 313,405 316,415 305,410 294,415 297,405 288,395 300,395"/>
+  </g>
+</svg> 
